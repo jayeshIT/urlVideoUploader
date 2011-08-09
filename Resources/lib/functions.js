@@ -9,7 +9,12 @@
 					var video = event.media;
 					movieFile = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mymovie.mov');
 					movieFile.write(video);
+					
+					var db = Titanium.Database.open('mydb');
+					db.execute('INSERT INTO videos (nome, uploaded) VALUES(?,?)', 'mymovie.mov', 0);
+					db.close();
 					myApp.uploadDialog('mymovie.mov');
+
 				},
 				cancel:function()
 				{
@@ -131,18 +136,29 @@
 	};
 	
 	myApp.getVideoList = function(){
+			var db = Titanium.Database.open('mydb');
+			var rows = db.execute("SELECT nome,strftime('%m-%d', data) data, uploaded, vid FROM videos");
 			var data = [];
-			for (var c=0; c<10; c++) 
-			{
+			while (rows.isValidRow()) {
+				
 				var row = Ti.UI.createTableViewRow({
 					title:'TitleVideo',
 					videoId:c,
 					backgroundColor:'#ffffff',
 					selectedBackgroundColor:'#dddddd'
 				}); 
+				var name = Ti.UI.createLabel({ 
+					text: rows.fieldByName('name'), 
+					color: '#000', 
+					font:{fontWeight:'bold',fontSize:16}
+					});
+				row.add(name);
+				row.name = 	rows.fieldByName('name');
 				data.push(row);
+				rows.next();
 			}
-			
+			rows.close();
+			db.close();
 		
 		
 		// create table view
