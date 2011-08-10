@@ -6,14 +6,16 @@
 	
 				success:function(event)
 				{
+					var d=new Date();
+					var filename = 'video-'+d.getTime();
 					var video = event.media;
-					movieFile = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'mymovie.mov');
+					movieFile = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,filename);
 					movieFile.write(video);
 					
 					var db = Titanium.Database.open('mydb');
-					db.execute('INSERT INTO videos (nome, uploaded) VALUES(?,?)', 'mymovie.mov', 0);
+					db.execute('INSERT INTO videos (nome, uploaded) VALUES(?,?)', filename, 0);
 					db.close();
-					myApp.uploadDialog('mymovie.mov');
+					myApp.uploadDialog(filename);
 
 				},
 				cancel:function()
